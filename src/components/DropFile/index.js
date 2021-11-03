@@ -1,48 +1,65 @@
 import { useCallback } from 'react'
 import XLSX from 'xlsx'
+import { useDispatch } from 'react-redux'
 
 import { useDropzone } from 'react-dropzone'
-
+import { loadExpensesList, loadExpensesTotal } from '../../redux/slices/expenses-slice'
 import useStyles from './styles'
 
 function DropFile({ dragTxt, droptxt }) {
     const styles = useStyles()
+    const dispatch = useDispatch()
 
     const onDrop = useCallback(acceptedFiles => {
         const reader = new FileReader()
-        const file = acceptedFiles[0]
-
-        console.log(acceptedFiles[0])
-        console.log(reader)
+        const selectedFile = acceptedFiles[0]
+        reader.readAsBinaryString(selectedFile)
 
         reader.onload = e => {
-            console.log('onload chamado')
-            const binaryData = reader.result
-            console.log(binaryData)
-            const workbook = XLSX.read(binaryData, {cellDates: true, type: 'buffer'})
-            console.log("workbook =>", workbook)
+
+            const binaryData = e.target.result
+
+            const workbook = XLSX.read(binaryData, {
+                // cellDates: true,
+                type: 'binary',
+            })
+
             const sheetName = workbook.SheetNames[0]
 
+            const allData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName])
 
-            // workbook[sheetName].forEach(e => console.log(e))
+            const data = allData.filter(i => i.Categoria !== "Transferências")
 
-            // const cells = workbook.Sheets[sheetName].map(e => e)
+            // console.log(data);
 
-            // console.log(cells)
+            const expenses = data.filter(i => i.Tipo === 'D')
+            const income = data.filter(i => i.Tipo === 'C')
+
+            const calculateTotal = (list) => {
+                let total = 0
+                list.forEach(i => {
+                    total += i.Valor
+                })
+                return Intl.NumberFormat('pt-BR').format(total)
+            }
+
+            const totalExpenses = calculateTotal(expenses)
+            const totalIncome = calculateTotal(income)
 
 
+           alert(`Total de despesas ${totalExpenses} e Total de receitas ${totalIncome}`)
 
+           dispatch(loadExpensesList(expenses))
+           dispatch(loadExpensesTotal(totalExpenses))
         }
 
         reader.onloadend = e => {
             console.log('onloadend chamado')
         }
-
-        reader.readAsArrayBuffer(file)
     }, [])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: '.xlsx,.xls',
+        accept: '.xlsx,.xls,.csv',
     })
 
     return (

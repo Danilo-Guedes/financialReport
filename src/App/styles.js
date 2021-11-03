@@ -5,9 +5,11 @@ const useStyles = makeStyles((theme) => ({
         margin: 20,
         display: 'flex',
         flex: 1,
+        flexDirection: 'column',
         height: '80vh',
         width: '90vw',
-        justifyContent: 'center',
+        // justifyContent: 'center',
+        alignItems: 'center'
 
     }
 }))
