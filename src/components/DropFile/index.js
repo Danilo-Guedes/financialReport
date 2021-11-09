@@ -106,13 +106,19 @@ function DropFile({ dragTxt, droptxt }) {
 
             const categorizedTotals = calculateCategorizedTotal(categorizedExpenses)
 
+            const sortedCategorizedTotal = categorizedTotals.sort((a, b)=> {
+                 if (Number(a.total) < Number(b.total)) return 1
+                 if (Number(a.total) > Number(b.total)) return -1
+                 return 0
+                })
+
             
 
 
             dispatch(loadExpensesList(categorizedExpenses))
             dispatch(loadExpensesTotal(totalExpenses))
             dispatch(loadCategorizedExpenses(categorizedExpenses))
-            dispatch(loadCategorizedTotals(categorizedTotals))
+            dispatch(loadCategorizedTotals(sortedCategorizedTotal))
         }
         
 
