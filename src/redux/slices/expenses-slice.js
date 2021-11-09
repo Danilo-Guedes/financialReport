@@ -3,18 +3,26 @@ import { createSlice } from '@reduxjs/toolkit'
 const expensesSlice = createSlice({
     name: 'expenses',
     initialState: {
-        list: null,
-        total: null
+        expensesList: null,
+        generalTotal: null,
+        categorizedExpenses: null,
+        categorizedTotals: null
     },
     reducers: {
         loadExpensesList(state, action) {
-            state.list = action.payload
+            state.expensesList = action.payload
         },
         loadExpensesTotal(state, action) {
-            state.total = action.payload
+            state.generalTotal = action.payload
+        },
+        loadCategorizedExpenses(state, action) {
+            state.categorizedExpenses = action.payload
+        },
+        loadCategorizedTotals(state, action) {
+            state.categorizedTotals = action.payload
         }
     },
 })
 
-export const { loadExpensesList, loadExpensesTotal } = expensesSlice.actions
+export const { loadExpensesList, loadExpensesTotal, loadCategorizedExpenses, loadCategorizedTotals } = expensesSlice.actions
 export default expensesSlice.reducer

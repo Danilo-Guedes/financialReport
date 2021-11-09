@@ -3,7 +3,12 @@ import XLSX from 'xlsx'
 import { useDispatch } from 'react-redux'
 
 import { useDropzone } from 'react-dropzone'
-import { loadExpensesList, loadExpensesTotal } from '../../redux/slices/expenses-slice'
+import {
+    loadCategorizedExpenses,
+    loadCategorizedTotals,
+    loadExpensesList,
+    loadExpensesTotal,
+} from '../../redux/slices/expenses-slice'
 import useStyles from './styles'
 
 function DropFile({ dragTxt, droptxt }) {
@@ -16,7 +21,6 @@ function DropFile({ dragTxt, droptxt }) {
         reader.readAsBinaryString(selectedFile)
 
         reader.onload = e => {
-
             const binaryData = e.target.result
 
             const workbook = XLSX.read(binaryData, {
@@ -28,17 +32,19 @@ function DropFile({ dragTxt, droptxt }) {
 
             const allData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName])
 
-            const data = allData.filter(i => i.Categoria !== "Transferências")
+            const data = allData.filter(i => i.Categoria !== 'Transferências')
 
             // console.log(data);
 
             const expenses = data.filter(i => i.Tipo === 'D')
             const income = data.filter(i => i.Tipo === 'C')
 
-            const calculateTotal = (list) => {
+            // console.log(JSON.stringify(expenses))
+
+            const calculateTotal = list => {
                 let total = 0
                 list.forEach(i => {
-                    total += i.Valor
+                    total += Number(i.Valor)
                 })
                 return Intl.NumberFormat('pt-BR').format(total)
             }
@@ -46,20 +52,77 @@ function DropFile({ dragTxt, droptxt }) {
             const totalExpenses = calculateTotal(expenses)
             const totalIncome = calculateTotal(income)
 
+            alert(
+                `Total de despesas ${totalExpenses} e Total de receitas ${totalIncome}`
+            )
 
-           alert(`Total de despesas ${totalExpenses} e Total de receitas ${totalIncome}`)
+            const separateCategories = data => {
+                const categories = new Set()
+                expenses.forEach(exp => {
+                    categories.add(exp.Categoria)
+                })
+                return Array.from(categories)
+            }
 
-           dispatch(loadExpensesList(expenses))
-           dispatch(loadExpensesTotal(totalExpenses))
+            const expensesCategories = separateCategories(expenses)
+
+            // console.log('qtde categorias =>', expensesCategories.length)
+
+            const categorizedExpenses = expensesCategories.map(ctg => {
+                const expAux = expenses.filter(exp => {
+                    return exp.Categoria === ctg
+                })
+                return {
+                    [ctg]: expAux,
+                }
+            })
+
+            // console.log(JSON.stringify(categorizedExpenses));
+
+            const calculateCategorizedTotal = (list) => {
+                return list.map((xp, idx) => {
+                    // console.log(xp, idx)
+                    // console.log(typeof xp)
+
+                    const entries = Object.entries(xp)
+
+                    let total = 0
+                    entries?.[0]?.[1].forEach(xp => {
+                        // console.log(xp)
+                        total += Number(xp.Valor)
+                    })
+
+                    // console.log({[entries?.[0]?.[0]]: total,});
+
+                    return {
+                       categoria : [entries?.[0]?.[0]],
+                       total:  total.toFixed(2),
+                    }
+
+                    // return totalAux
+                    // console.log(totalAux);
+                })
+            }
+
+            const categorizedTotals = calculateCategorizedTotal(categorizedExpenses)
+
+            
+
+
+            dispatch(loadExpensesList(categorizedExpenses))
+            dispatch(loadExpensesTotal(totalExpenses))
+            dispatch(loadCategorizedExpenses(categorizedExpenses))
+            dispatch(loadCategorizedTotals(categorizedTotals))
         }
+        
 
-        reader.onloadend = e => {
-            console.log('onloadend chamado')
-        }
+        // reader.onloadend = e => {
+        //     console.log('onloadend chamado')
+        // }
     }, [])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: '.xlsx,.xls,.csv',
+        accept: '.xlsx,.xls',
     })
 
     return (
