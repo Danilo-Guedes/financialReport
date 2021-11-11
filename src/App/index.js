@@ -13,6 +13,7 @@ import {
 } from 'recharts'
 import useStyles from './styles'
 import DropFile from '../components/DropFile'
+import Logo from '../svg/Logo'
 import { currencyFormater } from '../utils/functions'
 import { randomColorGenerator } from '../utils/colors'
 
@@ -27,11 +28,14 @@ function App() {
 
     return (
         <Box className={styles.wrapper}>
+            <Box className={styles.logoAndDrop} >
+            <Logo style={{width: 200, height: 200}}/>
             <DropFile
                 dragTxt='Arraste o extrato financeiro mensal no formato .xlsx .xls'
                 droptxt='Solte o arquivo para o processamento dos dados'
                 maxFiles={1}
             />
+            </Box>
 
             {categorizedTotals && (
                 <ResponsiveContainer>

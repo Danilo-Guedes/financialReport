@@ -1,7 +1,7 @@
-import { makeStyles } from "@mui/styles";
+import { makeStyles } from '@mui/styles'
 
-const useStyles = makeStyles((theme) => ({
-    wrapper : {
+const useStyles = makeStyles(theme => ({
+    wrapper: {
         margin: 20,
         display: 'flex',
         flex: 1,
@@ -9,8 +9,13 @@ const useStyles = makeStyles((theme) => ({
         height: '80vh',
         width: '90vw',
         // justifyContent: 'center',
-        alignItems: 'center'
-
+        alignItems: 'center',
+    },
+    logoAndDrop: {
+        width: '95%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 }))
 
