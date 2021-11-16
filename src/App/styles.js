@@ -10,6 +10,10 @@ const useStyles = makeStyles(theme => ({
         width: '90vw',
         // justifyContent: 'center',
         alignItems: 'center',
+        '& span' : {
+            fontFamily : 'Montserrat',
+            fontSize: 20,
+        }
     },
     logoAndDrop: {
         width: '95%',

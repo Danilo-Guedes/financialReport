@@ -4,12 +4,20 @@ import { useDispatch } from 'react-redux'
 
 import { useDropzone } from 'react-dropzone'
 import {
-    loadCategorizedExpenses,
-    loadCategorizedTotals,
     loadExpensesList,
     loadExpensesTotal,
+    loadCategorizedExpenses,
+    loadCategorizedExpensesTotals,
 } from '../../redux/slices/expenses-slice'
+import {
+    loadIncomesList,
+    loadIncomesTotal,
+    loadCategorizedIncomes,
+    loadCategorizedIncomesTotals
+} from '../../redux/slices/incomes-slice'
+import { handleExpenses } from '../../ExcelHandlers/expensesXLHandler'
 import useStyles from './styles'
+import { handleIncome } from '../../ExcelHandlers/incomeXLHandler'
 
 function DropFile({ dragTxt, droptxt }) {
     const styles = useStyles()
@@ -24,108 +32,48 @@ function DropFile({ dragTxt, droptxt }) {
             const binaryData = e.target.result
 
             const workbook = XLSX.read(binaryData, {
-                // cellDates: true,
+                cellDates: true,
                 type: 'binary',
             })
 
             const sheetName = workbook.SheetNames[0]
 
-            const allData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName])
-
-            const data = allData.filter(i => i.Categoria !== 'Transferências')
-
-            // console.log(data);
-
-            const expenses = data.filter(i => i.Tipo === 'D')
-            const income = data.filter(i => i.Tipo === 'C')
-
-            // console.log(JSON.stringify(expenses))
-
-            const calculateTotal = list => {
-                let total = 0
-                list.forEach(i => {
-                    total += Number(i.Valor)
-                })
-                return Intl.NumberFormat('pt-BR').format(total)
-            }
-
-            const totalExpenses = calculateTotal(expenses)
-            const totalIncome = calculateTotal(income)
-
-            alert(
-                `Total de despesas ${totalExpenses} e Total de receitas ${totalIncome}`
+            const parsedExcel = XLSX.utils.sheet_to_json(
+                workbook.Sheets[sheetName]
             )
 
-            const separateCategories = data => {
-                const categories = new Set()
-                expenses.forEach(exp => {
-                    categories.add(exp.Categoria)
-                })
-                return Array.from(categories)
-            }
+            const {
+                expenses,
+                categorizedExpenses,
+                totalExpenses,
+                sortedExpensesCategorizedTotal,
+            } = handleExpenses(parsedExcel)
 
-            const expensesCategories = separateCategories(expenses)
+            const {
+                incomes,
+                categorizedIncomes,
+                totalIncomes,
+                sortedIncomesCategorizedTotal,
+            } = handleIncome(parsedExcel)
 
-            // console.log('qtde categorias =>', expensesCategories.length)
-
-            const categorizedExpenses = expensesCategories.map(ctg => {
-                const expAux = expenses.filter(exp => {
-                    return exp.Categoria === ctg
-                })
-                return {
-                    [ctg]: expAux,
-                }
-            })
-
-            // console.log(JSON.stringify(categorizedExpenses));
-
-            const calculateCategorizedTotal = (list) => {
-                return list.map((xp, idx) => {
-                    // console.log(xp, idx)
-                    // console.log(typeof xp)
-
-                    const entries = Object.entries(xp)
-
-                    let total = 0
-                    entries?.[0]?.[1].forEach(xp => {
-                        // console.log(xp)
-                        total += Number(xp.Valor)
-                    })
-
-                    // console.log({[entries?.[0]?.[0]]: total,});
-
-                    return {
-                       categoria : [entries?.[0]?.[0]],
-                       total:  total.toFixed(2),
-                    }
-
-                    // return totalAux
-                    // console.log(totalAux);
-                })
-            }
-
-            const categorizedTotals = calculateCategorizedTotal(categorizedExpenses)
-
-            const sortedCategorizedTotal = categorizedTotals.sort((a, b)=> {
-                 if (Number(a.total) < Number(b.total)) return 1
-                 if (Number(a.total) > Number(b.total)) return -1
-                 return 0
-                })
-
-            
-
-
-            dispatch(loadExpensesList(categorizedExpenses))
+            // expenses
+            dispatch(loadExpensesList(expenses))
             dispatch(loadExpensesTotal(totalExpenses))
             dispatch(loadCategorizedExpenses(categorizedExpenses))
-            dispatch(loadCategorizedTotals(sortedCategorizedTotal))
+            dispatch(loadCategorizedExpensesTotals(sortedExpensesCategorizedTotal))
+
+            //income
+            dispatch(loadIncomesList(incomes))
+            dispatch(loadIncomesTotal(totalIncomes))
+            dispatch(loadCategorizedIncomes(categorizedIncomes))
+            dispatch(loadCategorizedIncomesTotals(sortedIncomesCategorizedTotal))
         }
-        
 
         // reader.onloadend = e => {
         //     console.log('onloadend chamado')
         // }
     }, [])
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: '.xlsx,.xls',
