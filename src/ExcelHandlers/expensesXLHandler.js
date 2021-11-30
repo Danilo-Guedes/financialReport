@@ -1,11 +1,9 @@
 export function handleExpenses(parsedXLtoObj) {
-
-    const transformeDate = (data) => {
-
+    const transformeDate = data => {
         const withRightDateObj = data.map(i => {
             return {
                 ...i,
-                Data : i.Data.toLocaleDateString()
+                Data: i.Data.toLocaleDateString(),
             }
         })
         return withRightDateObj
@@ -19,12 +17,13 @@ export function handleExpenses(parsedXLtoObj) {
 
     const expenses = filterdJson.filter(i => i.Tipo === 'D')
 
-    const calculateTotal = list => {  //TODO: transfor into a function CalculateTotalInJSON where recieve a column name as a parameter
+    const calculateTotal = list => {
+        //TODO: transfor into a function CalculateTotalInJSON where recieve a column name as a parameter
         let total = 0
         list.forEach(i => {
             total += Number(i.Valor)
         })
-    //   const formatedValue = Intl.NumberFormat('pt-BR').format(total)
+        //   const formatedValue = Intl.NumberFormat('pt-BR').format(total)
 
         return parseFloat(total.toFixed(2))
     }
@@ -68,6 +67,37 @@ export function handleExpenses(parsedXLtoObj) {
 
     const categorizedTotals = calculateCategorizedTotal(categorizedExpenses)
 
+    const separateFixedAndVariableCosts = list => {
+        const fixedCosts = []
+        const variableCosts = []
+        let fixedTotal = 0
+        let variableTotal = 0
+
+        list.forEach(i => {
+            if (i.categoria.includes('#f')) {
+                fixedCosts.push(i)
+                fixedTotal += i.total
+            } else {
+                variableCosts.push(i)
+                variableTotal += i.total
+            }
+        })
+
+        const finalObj = {
+            fixedCosts,
+            variableCosts,
+            totals : {
+                fixedTotal,
+                variableTotal
+            }
+        }
+
+        return finalObj
+    }
+
+    const fixedAndVariableCosts =
+        separateFixedAndVariableCosts(categorizedTotals)
+
     const sortedExpensesCategorizedTotal = categorizedTotals.sort((a, b) => {
         if (Number(a.total) < Number(b.total)) return 1
         if (Number(a.total) > Number(b.total)) return -1
@@ -79,5 +109,6 @@ export function handleExpenses(parsedXLtoObj) {
         categorizedExpenses,
         totalExpenses,
         sortedExpensesCategorizedTotal,
+        fixedAndVariableCosts,
     }
 }

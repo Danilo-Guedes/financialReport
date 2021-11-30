@@ -34,6 +34,11 @@ function App() {
     const incomesGeneralTotal = useSelector(
         state => state.incomes?.generalIncomesTotal
     )
+    const fixedAndVariableCosts = useSelector(
+        state => state.expenses?.fixedAndVariableCosts
+    )
+
+    console.log(fixedAndVariableCosts)
 
     const COLORS = [
         'forestgreen',
@@ -77,10 +82,12 @@ function App() {
                             interval={0}
                             angle={-30}
                             textAnchor='end'
+                            tickFormatter={value =>
+                                value.replace('#v', '').replace('#f', '')
+                            }
                         />
                         <YAxis
                             tickFormatter={value => currencyFormater(value)}
-                            domain={[0, 20000]}
                         />
                         <Tooltip
                             formatter={(value, name, porps) => [
@@ -119,7 +126,7 @@ function App() {
                         Total de Receitas{' '}
                         {currencyFormater(incomesGeneralTotal)}
                     </Typography>
-                    <ResponsiveContainer width={700} height={400}>
+                    <ResponsiveContainer width={900} height={400}>
                         <PieChart>
                             <Pie
                                 data={categorizedIncomesTotals}
@@ -144,7 +151,11 @@ function App() {
                                 align='left'
                                 layout='vertical'
                                 formatter={(value, entry, idx) => {
-                                    return `${entry.payload?.categoria} - ${(
+                                    return `${
+                                        entry.payload?.categoria
+                                    } - ${currencyFormater(
+                                        entry.payload?.total
+                                    )} -  ${(
                                         entry.payload?.percent * 100
                                     ).toFixed(2)} %`
                                 }}

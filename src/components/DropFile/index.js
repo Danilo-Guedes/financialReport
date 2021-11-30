@@ -8,6 +8,7 @@ import {
     loadExpensesTotal,
     loadCategorizedExpenses,
     loadCategorizedExpensesTotals,
+    loadFixedAndVariableCosts
 } from '../../redux/slices/expenses-slice'
 import {
     loadIncomesList,
@@ -47,6 +48,7 @@ function DropFile({ dragTxt, droptxt }) {
                 categorizedExpenses,
                 totalExpenses,
                 sortedExpensesCategorizedTotal,
+                fixedAndVariableCosts
             } = handleExpenses(parsedExcel)
 
             const {
@@ -61,6 +63,7 @@ function DropFile({ dragTxt, droptxt }) {
             dispatch(loadExpensesTotal(totalExpenses))
             dispatch(loadCategorizedExpenses(categorizedExpenses))
             dispatch(loadCategorizedExpensesTotals(sortedExpensesCategorizedTotal))
+            dispatch(loadFixedAndVariableCosts(fixedAndVariableCosts))
 
             //income
             dispatch(loadIncomesList(incomes))

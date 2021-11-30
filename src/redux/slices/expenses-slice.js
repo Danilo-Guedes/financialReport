@@ -6,7 +6,8 @@ const expensesSlice = createSlice({
         expensesList: null,
         generalTotal: null,
         categorizedExpenses: null,
-        categorizedExpensesTotals: null
+        categorizedExpensesTotals: null,
+        fixedAndVariableCosts: null
     },
     reducers: {
         loadExpensesList(state, action) {
@@ -20,9 +21,12 @@ const expensesSlice = createSlice({
         },
         loadCategorizedExpensesTotals(state, action) {
             state.categorizedExpensesTotals = action.payload
+        },
+        loadFixedAndVariableCosts(state, action) {
+            state.fixedAndVariableCosts = action.payload
         }
     },
 })
 
-export const { loadExpensesList, loadExpensesTotal, loadCategorizedExpenses, loadCategorizedExpensesTotals } = expensesSlice.actions
+export const { loadExpensesList, loadExpensesTotal, loadCategorizedExpenses, loadCategorizedExpensesTotals, loadFixedAndVariableCosts } = expensesSlice.actions
 export default expensesSlice.reducer
