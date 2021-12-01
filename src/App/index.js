@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Box, Typography } from '@mui/material'
 import {
@@ -38,8 +39,6 @@ function App() {
         state => state.expenses?.fixedAndVariableCosts
     )
 
-    console.log(fixedAndVariableCosts)
-
     const COLORS = [
         'forestgreen',
         'orangered',
@@ -72,7 +71,7 @@ function App() {
                         margin={{
                             top: 0,
                             right: 10,
-                            bottom: 100,
+                            bottom: 120,
                             left: 50,
                         }}
                     >
@@ -92,19 +91,23 @@ function App() {
                         <Tooltip
                             formatter={(value, name, porps) => [
                                 currencyFormater(value),
-                                name,
                             ]}
                         />
                         <Legend
-                            formatter={(value, entry, index) =>
-                                `Total de despesas ${currencyFormater(
-                                    expensesGeneraltotal
-                                )}`
-                            }
+                            formatter={() => (
+                                <Typography
+                                    variant='span'
+                                    className={styles.totals}
+                                >
+                                    {`Total de despesas ${currencyFormater(
+                                        expensesGeneraltotal
+                                    )}`}
+                                </Typography>
+                            )}
                             iconType='line'
                             verticalAlign='top'
                             align='center'
-                            height={20}
+                            height={50}
                         />
                         <Bar dataKey='total' barSize={25} minPointSize={5}>
                             {categorizedExpensesTotals.map((obj, idx) => (
@@ -117,12 +120,61 @@ function App() {
                     </BarChart>
                 </ResponsiveContainer>
             )}
-            {categorizedIncomesTotals && (
-                <>
-                    <Typography
-                        variant='span'
-                        style={{ marginTop: 30, marginBottom: '-30px' }}
+            {fixedAndVariableCosts && (
+                <Box className={styles.fixedAndVarBar} >
+                <ResponsiveContainer width={900} height={400}>
+                    <BarChart
+                        width={500}
+                        height={300}
+                        data={fixedAndVariableCosts.totals}
+                        margin={{
+                            top: 50,
+                            right: 0,
+                            left: 50,
+                            bottom: 0,
+                        }}
                     >
+                        <CartesianGrid strokeDasharray='3 3' />
+                        <XAxis dataKey='type' />
+                        <YAxis
+                            tickFormatter={value => currencyFormater(value)}
+                        />
+                        <Tooltip
+                            formatter={(value, name, porps) => [
+                                currencyFormater(value),
+                            ]}
+                        />
+                               <Legend
+                            formatter={() => (
+                                <Typography
+                                    variant='span'
+                                    className={styles.totals}
+                                >
+                                    {`Custo Fixo ${currencyFormater(fixedAndVariableCosts.totals[0].total)} - Custo Variável ${currencyFormater(fixedAndVariableCosts.totals[1].total)}`}
+                                </Typography>
+                            )}
+                            iconType='line'
+                            verticalAlign='top'
+                            align='center'
+                            height={60}
+                        />
+                        <Bar dataKey='total'>
+                            {fixedAndVariableCosts.totals.map((i, idx) => {
+                                return (
+                                    <Cell
+                                        key={`bar-${i.type}`}
+                                        fill={COLORS[idx % COLORS.length]}
+                                    />
+                                )
+                            })}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+                </Box>
+            )}
+            {categorizedIncomesTotals && (
+                <Box className={styles.pieChartWrapper}>
+                    <Typography variant='span' className={styles.totals}>
                         Total de Receitas{' '}
                         {currencyFormater(incomesGeneralTotal)}
                     </Typography>
@@ -176,7 +228,7 @@ function App() {
                             />
                         </PieChart>
                     </ResponsiveContainer>
-                </>
+                </Box>
             )}
         </Box>
     )

@@ -86,10 +86,10 @@ export function handleExpenses(parsedXLtoObj) {
         const finalObj = {
             fixedCosts,
             variableCosts,
-            totals : {
-                fixedTotal,
-                variableTotal
-            }
+            totals : [
+                {type: 'Custo Fixo', total: fixedTotal},
+                {type: 'Custo Variável', total: variableTotal}
+            ]
         }
 
         return finalObj
