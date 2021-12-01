@@ -121,55 +121,71 @@ function App() {
                 </ResponsiveContainer>
             )}
             {fixedAndVariableCosts && (
-                <Box className={styles.fixedAndVarBar} >
-                <ResponsiveContainer width={900} height={400}>
-                    <BarChart
-                        width={500}
-                        height={300}
-                        data={fixedAndVariableCosts.totals}
-                        margin={{
-                            top: 50,
-                            right: 0,
-                            left: 50,
-                            bottom: 0,
-                        }}
-                    >
-                        <CartesianGrid strokeDasharray='3 3' />
-                        <XAxis dataKey='type' />
-                        <YAxis
-                            tickFormatter={value => currencyFormater(value)}
-                        />
-                        <Tooltip
-                            formatter={(value, name, porps) => [
-                                currencyFormater(value),
-                            ]}
-                        />
-                               <Legend
-                            formatter={() => (
-                                <Typography
-                                    variant='span'
-                                    className={styles.totals}
-                                >
-                                    {`Custo Fixo ${currencyFormater(fixedAndVariableCosts.totals[0].total)} - Custo Variável ${currencyFormater(fixedAndVariableCosts.totals[1].total)}`}
-                                </Typography>
-                            )}
-                            iconType='line'
-                            verticalAlign='top'
-                            align='center'
-                            height={60}
-                        />
-                        <Bar dataKey='total'>
-                            {fixedAndVariableCosts.totals.map((i, idx) => {
-                                return (
-                                    <Cell
-                                        key={`bar-${i.type}`}
-                                        fill={COLORS[idx % COLORS.length]}
-                                    />
-                                )
-                            })}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
+                <Box className={styles.fixedAndVarBar}>
+                    <ResponsiveContainer width={900} height={400}>
+                        <BarChart
+                            width={500}
+                            height={300}
+                            data={fixedAndVariableCosts.totals}
+                            margin={{
+                                top: 50,
+                                right: 0,
+                                left: 50,
+                                bottom: 0,
+                            }}
+                        >
+                            <CartesianGrid strokeDasharray='3 3' />
+                            <XAxis dataKey='type' />
+                            <YAxis
+                                tickFormatter={value => currencyFormater(value)}
+                            />
+                            <Tooltip
+                                formatter={(value, name, porps) => [
+                                    currencyFormater(value),
+                                ]}
+                            />
+                            <Legend
+                                formatter={() => (
+                                    <Typography
+                                        variant='span'
+                                        className={styles.totals}
+                                    >
+                                        {`Custo Fixo ${(
+                                            (fixedAndVariableCosts.totals[0]
+                                                .total /
+                                                expensesGeneraltotal) *
+                                            100
+                                        ).toFixed(2)}%  ${currencyFormater(
+                                            fixedAndVariableCosts.totals[0]
+                                                .total
+                                        )} - Custo Variável ${(
+                                            (fixedAndVariableCosts.totals[1]
+                                                .total /
+                                                expensesGeneraltotal) *
+                                            100
+                                        ).toFixed(2)}%  ${currencyFormater(
+                                            fixedAndVariableCosts.totals[1]
+                                                .total
+                                        )}`}
+                                    </Typography>
+                                )}
+                                iconType='line'
+                                verticalAlign='top'
+                                align='center'
+                                height={60}
+                            />
+                            <Bar dataKey='total'>
+                                {fixedAndVariableCosts.totals.map((i, idx) => {
+                                    return (
+                                        <Cell
+                                            key={`bar-${i.type}`}
+                                            fill={COLORS[idx % COLORS.length]}
+                                        />
+                                    )
+                                })}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
                 </Box>
             )}
             {categorizedIncomesTotals && (
